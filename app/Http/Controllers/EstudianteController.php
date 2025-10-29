@@ -7,6 +7,7 @@ use App\Models\Estudiante;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class EstudianteController extends Controller
@@ -16,6 +17,10 @@ class EstudianteController extends Controller
      */
     public function index(Request $request): View|RedirectResponse
     {
+        if ($redirect = $this->asegurarModuloDisponible()) {
+            return $redirect;
+        }
+
         $usuario = Auth::user();
 
         if (!$usuario || !$usuario->hasAnyPermission(['gestionar_estudiantes', 'ver_estudiantes'])) {
@@ -61,6 +66,10 @@ class EstudianteController extends Controller
      */
     public function crear(): View|RedirectResponse
     {
+        if ($redirect = $this->asegurarModuloDisponible()) {
+            return $redirect;
+        }
+
         $usuario = Auth::user();
 
         if (!$usuario || !$usuario->hasAnyPermission(['gestionar_estudiantes', 'matricular_estudiantes'])) {
@@ -77,6 +86,10 @@ class EstudianteController extends Controller
      */
     public function guardar(Request $request): RedirectResponse
     {
+        if ($redirect = $this->asegurarModuloDisponible()) {
+            return $redirect;
+        }
+
         $usuario = Auth::user();
 
         if (!$usuario || !$usuario->hasAnyPermission(['gestionar_estudiantes', 'matricular_estudiantes'])) {
@@ -105,6 +118,10 @@ class EstudianteController extends Controller
      */
     public function mostrar(Estudiante $estudiante): View|RedirectResponse
     {
+        if ($redirect = $this->asegurarModuloDisponible()) {
+            return $redirect;
+        }
+
         $usuario = Auth::user();
 
         if (!$usuario || !$usuario->hasAnyPermission(['gestionar_estudiantes', 'ver_estudiantes'])) {
@@ -121,6 +138,10 @@ class EstudianteController extends Controller
      */
     public function editar(Estudiante $estudiante): View|RedirectResponse
     {
+        if ($redirect = $this->asegurarModuloDisponible()) {
+            return $redirect;
+        }
+
         $usuario = Auth::user();
 
         if (!$usuario || !$usuario->hasAnyPermission(['gestionar_estudiantes', 'matricular_estudiantes'])) {
@@ -138,6 +159,10 @@ class EstudianteController extends Controller
      */
     public function actualizar(Request $request, Estudiante $estudiante): RedirectResponse
     {
+        if ($redirect = $this->asegurarModuloDisponible()) {
+            return $redirect;
+        }
+
         $usuario = Auth::user();
 
         if (!$usuario || !$usuario->hasAnyPermission(['gestionar_estudiantes', 'matricular_estudiantes'])) {
@@ -166,6 +191,10 @@ class EstudianteController extends Controller
      */
     public function eliminar(Estudiante $estudiante): RedirectResponse
     {
+        if ($redirect = $this->asegurarModuloDisponible()) {
+            return $redirect;
+        }
+
         $usuario = Auth::user();
 
         if (!$usuario || !$usuario->hasAnyPermission(['gestionar_estudiantes', 'matricular_estudiantes'])) {
@@ -183,5 +212,17 @@ class EstudianteController extends Controller
     private function cursosDisponibles()
     {
         return Curso::orderBy('nombre')->get();
+    }
+
+    private function asegurarModuloDisponible(): ?RedirectResponse
+    {
+        if (!Schema::hasTable('estudiantes')) {
+            return redirect()->route('dashboard')->with(
+                'error',
+                'Debes ejecutar las migraciones más recientes (php artisan migrate) para habilitar la gestión de estudiantes.'
+            );
+        }
+
+        return null;
     }
 }

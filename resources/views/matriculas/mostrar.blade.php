@@ -7,7 +7,8 @@
     $puedeGestionar = $puedeGestionar ?? false;
     $menuActivo = 'matriculas';
     $cursos = $cursos ?? collect();
-    $estudianteRegistrado = $matricula->estudianteRegistro;
+    $moduloEstudiantesListo = $moduloEstudiantesListo ?? false;
+    $estudianteRegistrado = $moduloEstudiantesListo ? $matricula->estudianteRegistro : null;
 @endphp
 
 @section('content')
@@ -37,6 +38,11 @@
                 @if(session('error'))
                     <div class="alert alert-danger">{{ session('error') }}</div>
                 @endif
+                @unless($moduloEstudiantesListo)
+                    <div class="alert alert-warning">
+                        Debes ejecutar las migraciones más recientes (<code>php artisan migrate</code>) para habilitar la creación automática de estudiantes desde las matrículas.
+                    </div>
+                @endunless
                 @if ($errors->any())
                     <div class="alert alert-danger">
                         <ul class="mb-0">

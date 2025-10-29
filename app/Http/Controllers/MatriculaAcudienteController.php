@@ -8,6 +8,7 @@ use App\Models\RolesModel;
 use App\Models\Estudiante;
 use App\Models\Curso;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Http\RedirectResponse;
@@ -99,10 +100,18 @@ class MatriculaAcudienteController extends Controller
         $usuario = Auth::user();
 
         if ($this->puedeGestionarMatrículas($usuario)) {
+            $moduloEstudiantesListo = $this->moduloEstudiantesListo();
+
             $busqueda = trim((string) $request->input('q'));
             $estado = $request->input('estado', 'todos');
 
-            $matriculas = MatriculaAcudiente::with(['curso', 'acudiente', 'estudianteRegistro'])
+            $matriculasQuery = MatriculaAcudiente::with(['curso', 'acudiente']);
+
+            if ($moduloEstudiantesListo) {
+                $matriculasQuery->with('estudianteRegistro');
+            }
+
+            $matriculas = $matriculasQuery
                 ->when($busqueda !== '', function ($query) use ($busqueda) {
                     $query->where(function ($sub) use ($busqueda) {
                         $sub->where('nombres', 'like', "%{$busqueda}%")
@@ -130,6 +139,7 @@ class MatriculaAcudienteController extends Controller
                 'busqueda' => $busqueda,
                 'estadoSeleccionado' => $estado,
                 'estadosDisponibles' => $estadosDisponibles,
+                'moduloEstudiantesListo' => $moduloEstudiantesListo,
             ]);
         }
 
@@ -158,10 +168,19 @@ class MatriculaAcudienteController extends Controller
             return redirect()->route('matriculas.index')->with('error', 'No autorizado.');
         }
 
+        $moduloEstudiantesListo = $this->moduloEstudiantesListo();
+
+        $relaciones = ['curso', 'acudiente'];
+
+        if ($moduloEstudiantesListo) {
+            $relaciones[] = 'estudianteRegistro';
+        }
+
         return view('matriculas.mostrar', [
-            'matricula' => $matricula->load(['curso', 'acudiente', 'estudianteRegistro']),
+            'matricula' => $matricula->load($relaciones),
             'puedeGestionar' => $puedeGestionar,
             'cursos' => $puedeGestionar ? Curso::orderBy('nombre')->get() : collect(),
+            'moduloEstudiantesListo' => $moduloEstudiantesListo,
         ]);
     }
 
@@ -192,6 +211,10 @@ class MatriculaAcudienteController extends Controller
         }
 
         if ($estado === 'aprobada') {
+            if (!$this->moduloEstudiantesListo()) {
+                return back()->with('error', 'Debes ejecutar las migraciones más recientes (php artisan migrate) antes de aprobar matrículas.');
+            }
+
             $estudiante = Estudiante::updateOrCreate(
                 ['documento_identidad' => $matricula->documento_identidad],
                 [
@@ -258,5 +281,11 @@ class MatriculaAcudienteController extends Controller
             'gestionar_estudiantes',
             'matricular_estudiantes',
         ]);
+    }
+
+    private function moduloEstudiantesListo(): bool
+    {
+        return Schema::hasTable('estudiantes')
+            && Schema::hasColumn('matriculas_acudientes', 'estudiante_registro_id');
     }
 }

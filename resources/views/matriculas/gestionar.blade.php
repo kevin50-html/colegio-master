@@ -29,6 +29,13 @@
                 @if(session('error'))
                     <div class="alert alert-danger">{{ session('error') }}</div>
                 @endif
+                @isset($moduloEstudiantesListo)
+                    @if(!$moduloEstudiantesListo)
+                        <div class="alert alert-warning">
+                            Debes ejecutar las migraciones más recientes (<code>php artisan migrate</code>) para habilitar la vinculación automática entre matrículas y estudiantes.
+                        </div>
+                    @endif
+                @endisset
 
                 <form method="GET" action="{{ route('matriculas.index') }}" class="row g-2 align-items-end mb-4">
                     <div class="col-12 col-md-6 col-lg-4">
