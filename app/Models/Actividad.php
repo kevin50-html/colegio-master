@@ -11,6 +11,8 @@ class Actividad extends Model
 {
     use HasFactory;
 
+    protected $table = 'actividades';
+
     protected $fillable = [
         'horario_id',
         'titulo',

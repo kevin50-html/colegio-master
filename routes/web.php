@@ -7,6 +7,7 @@ use App\Http\Controllers\RolController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\MatriculaAcudienteController;
 use App\Http\Controllers\EstudianteController;
+use App\Http\Controllers\AcademicoModuleController;
 use App\Http\Controllers\ActividadController;
 use App\Http\Controllers\CursoController;
 use App\Http\Controllers\DocenteController;
@@ -97,6 +98,11 @@ Route::middleware(['auth'])->group(function () {
 
     // Rutas de gestión académica (cursos → materias → periodos → horarios → actividades → notas)
     Route::prefix('academico')->name('academico.')->group(function () {
+        Route::get('/', [AcademicoModuleController::class, 'index'])->name('index');
+        Route::get('/modulos/materias', [AcademicoModuleController::class, 'materias'])->name('modulos.materias');
+        Route::get('/modulos/periodos', [AcademicoModuleController::class, 'periodos'])->name('modulos.periodos');
+        Route::get('/modulos/horarios', [AcademicoModuleController::class, 'horarios'])->name('modulos.horarios');
+        Route::get('/modulos/cursos-por-materias', [AcademicoModuleController::class, 'cursosPorMaterias'])->name('modulos.cursos-materias');
         Route::resource('cursos', CursoController::class);
         Route::resource('cursos.materias', MateriaController::class);
         Route::resource('materias.periodos', PeriodoController::class);

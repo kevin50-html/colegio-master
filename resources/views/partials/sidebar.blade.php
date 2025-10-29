@@ -2,6 +2,7 @@
     $usuarioActual = Auth::user();
     $rolActual = isset($rolActual) ? $rolActual : ($usuarioActual ? App\Models\RolesModel::find($usuarioActual->roles_id) : null);
     $menuActivo = $menuActivo ?? '';
+    $rutaActual = request()->route()?->getName();
 @endphp
 <div class="sidebar">
     <div class="p-3">
@@ -43,9 +44,26 @@
                 </a>
             @endif
             @if($rolActual->tienePermiso('gestionar_cursos') || $rolActual->tienePermiso('gestionar_materias') || $rolActual->tienePermiso('gestionar_periodos') || $rolActual->tienePermiso('gestionar_horarios') || $rolActual->tienePermiso('crear_actividades') || $rolActual->tienePermiso('registrar_notas') || $rolActual->tienePermiso('ver_cursos') || $rolActual->tienePermiso('ver_materias'))
-                <a class="nav-link {{ $menuActivo === 'academico' ? 'active' : '' }}" href="{{ route('academico.cursos.index') }}">
+                <a class="nav-link {{ $menuActivo === 'academico' && $rutaActual === 'academico.index' ? 'active' : '' }}" href="{{ route('academico.index') }}">
                     <i class="fas fa-school me-2"></i>Gestión Académica
                 </a>
+                <div class="nav flex-column ms-4 ps-2 border-start border-secondary-subtle">
+                    <a class="nav-link ps-2 small {{ request()->routeIs('academico.cursos.*') ? 'active' : 'text-white-50' }}" href="{{ route('academico.cursos.index') }}">
+                        <i class="fas fa-layer-group me-2"></i>Cursos
+                    </a>
+                    <a class="nav-link ps-2 small {{ request()->routeIs('academico.modulos.materias') || request()->routeIs('academico.cursos.materias.*') ? 'active' : 'text-white-50' }}" href="{{ route('academico.modulos.materias') }}">
+                        <i class="fas fa-book me-2"></i>Materias
+                    </a>
+                    <a class="nav-link ps-2 small {{ request()->routeIs('academico.modulos.periodos') || request()->routeIs('academico.materias.periodos.*') ? 'active' : 'text-white-50' }}" href="{{ route('academico.modulos.periodos') }}">
+                        <i class="fas fa-calendar-alt me-2"></i>Periodos
+                    </a>
+                    <a class="nav-link ps-2 small {{ request()->routeIs('academico.modulos.horarios') || request()->routeIs('academico.periodos.horarios.*') ? 'active' : 'text-white-50' }}" href="{{ route('academico.modulos.horarios') }}">
+                        <i class="fas fa-clock me-2"></i>Horarios
+                    </a>
+                    <a class="nav-link ps-2 small {{ request()->routeIs('academico.modulos.cursos-materias') ? 'active' : 'text-white-50' }}" href="{{ route('academico.modulos.cursos-materias') }}">
+                        <i class="fas fa-project-diagram me-2"></i>Cursos por materias
+                    </a>
+                </div>
             @endif
             @if($rolActual->tienePermiso('gestionar_disciplina'))
                 <a class="nav-link" href="#">
