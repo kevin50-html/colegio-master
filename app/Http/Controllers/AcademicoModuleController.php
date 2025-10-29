@@ -219,14 +219,24 @@ class AcademicoModuleController extends Controller
         $materias = Materia::orderBy('nombre')->get(['id', 'nombre']);
         $periodos = Periodo::with('cursoMateria.materia')->orderBy('orden')->get(['id', 'nombre', 'curso_materia_id']);
 
-        $diasDisponibles = Horario::select('dia')->distinct()->orderBy('dia')->pluck('dia')->all();
+        $columnaDia = Horario::diaColumn();
+
+        $diasDisponibles = Horario::query()
+            ->select($columnaDia)
+            ->distinct()
+            ->orderBy($columnaDia)
+            ->get()
+            ->pluck($columnaDia)
+            ->filter()
+            ->values()
+            ->all();
 
         $horarios = Horario::with(['cursoMateria.curso', 'cursoMateria.materia', 'periodo'])
             ->when($cursoId, fn ($query) => $query->whereHas('cursoMateria', fn ($sub) => $sub->where('curso_id', $cursoId)))
             ->when($materiaId, fn ($query) => $query->whereHas('cursoMateria', fn ($sub) => $sub->where('materia_id', $materiaId)))
             ->when($periodoId, fn ($query) => $query->where('periodo_id', $periodoId))
-            ->when($dia !== '', fn ($query) => $query->where('dia', $dia))
-            ->orderBy('dia')
+            ->when($dia !== '', fn ($query) => $query->where($columnaDia, $dia))
+            ->orderBy($columnaDia)
             ->orderBy('hora_inicio')
             ->paginate(15)
             ->withQueryString();
