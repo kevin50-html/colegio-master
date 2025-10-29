@@ -3,38 +3,37 @@
 @section('title', 'Dashboard - Colegio')
 
 @section('content')
+@php
+    $usuario = $usuario ?? Auth::user();
+    $rol = $rol ?? ($usuario ? $usuario->rol : null);
+    $pendientesMatriculas = $pendientesMatriculas ?? 0;
+@endphp
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ route('dashboard') }}">
             <i class="fas fa-file-invoice-dollar me-2"></i>Colegio
         </a>
-        
+
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
-        
+
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                @php 
-                    $rolTop = App\Models\RolesModel::find(Auth::user()->roles_id);
-                    $pendMat = ($rolTop && $rolTop->nombre === 'Acudiente') 
-                        ? App\Models\MatriculaAcudiente::where('user_id', Auth::id())->where('estado','pendiente')->count() 
-                        : 0;
-                @endphp
-                @if($rolTop && $rolTop->nombre === 'Acudiente')
+                @if($rol && $rol->nombre === 'Acudiente')
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="matriculasDropdown" role="button" data-bs-toggle="dropdown">
                         <i class="fas fa-folder me-1"></i>Matrículas
-                        @if($pendMat > 0)
-                            <span class="badge rounded-pill bg-warning text-dark ms-1">{{ $pendMat }}</span>
+                        @if($pendientesMatriculas > 0)
+                            <span class="badge rounded-pill bg-warning text-dark ms-1">{{ $pendientesMatriculas }}</span>
                         @endif
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="matriculasDropdown">
                         <li>
                             <a class="dropdown-item" href="{{ route('matriculas.index') }}">
                                 <i class="fas fa-list me-1"></i>Mis Matrículas
-                            @if($pendMat > 0)<span class="badge bg-warning text-dark ms-1">{{ $pendMat }}</span>@endif</a>
+                            @if($pendientesMatriculas > 0)<span class="badge bg-warning text-dark ms-1">{{ $pendientesMatriculas }}</span>@endif</a>
                         </li>
                         <li>
                             <a class="dropdown-item" href="{{ route('matriculas.crear') }}">
@@ -46,7 +45,7 @@
                 @endif
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user me-1"></i>{{ Auth::user()->name }}
+                        <i class="fas fa-user me-1"></i>{{ $usuario?->name }}
                     </a>
                     <ul class="dropdown-menu">
                         <li>
@@ -80,7 +79,7 @@
     <div class="row">
         <!-- Sidebar -->
         <div class="col-md-3 col-lg-2 p-0">
-            @include('partials.sidebar', ['menuActivo' => $menuActivo])
+            @include('partials.sidebar', ['menuActivo' => $menuActivo, 'rolActual' => $rol])
         </div>
         <!-- Main Content -->
         <div class="col-md-9 col-lg-10">
@@ -88,7 +87,7 @@
                 <!-- Welcome Section -->
                 <div class="row mb-4">
                     <div class="col-12">
-                        <h1 class="h3 text-dark">¡Bienvenido, {{ Auth::user()->name }}!</h1>
+                        <h1 class="h3 text-dark">¡Bienvenido, {{ $usuario?->name }}!</h1>
                         <p class="text-muted">Gestiona tus Colegio de manera eficiente</p>
                     </div>
                 </div>
