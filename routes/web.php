@@ -7,7 +7,14 @@ use App\Http\Controllers\RolController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\MatriculaAcudienteController;
 use App\Http\Controllers\EstudianteController;
+use App\Http\Controllers\AcademicoModuleController;
+use App\Http\Controllers\ActividadController;
+use App\Http\Controllers\CursoController;
 use App\Http\Controllers\DocenteController;
+use App\Http\Controllers\HorarioController;
+use App\Http\Controllers\MateriaController;
+use App\Http\Controllers\NotaController;
+use App\Http\Controllers\PeriodoController;
 
 // Ruta raíz redirige al login
 Route::get('/', function () {
@@ -87,5 +94,20 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{matricula}', [MatriculaAcudienteController::class, 'mostrar'])->name('mostrar');
         Route::get('/descargar/{ruta}', [MatriculaAcudienteController::class, 'descargarDocumento'])->name('descargar');
         Route::patch('/{matricula}/estado', [MatriculaAcudienteController::class, 'actualizarEstado'])->name('actualizarEstado');
+    });
+
+    // Rutas de gestión académica (cursos → materias → periodos → horarios → actividades → notas)
+    Route::prefix('academico')->name('academico.')->group(function () {
+        Route::get('/', [AcademicoModuleController::class, 'index'])->name('index');
+        Route::get('/modulos/materias', [AcademicoModuleController::class, 'materias'])->name('modulos.materias');
+        Route::get('/modulos/periodos', [AcademicoModuleController::class, 'periodos'])->name('modulos.periodos');
+        Route::get('/modulos/horarios', [AcademicoModuleController::class, 'horarios'])->name('modulos.horarios');
+        Route::get('/modulos/cursos-por-materias', [AcademicoModuleController::class, 'cursosPorMaterias'])->name('modulos.cursos-materias');
+        Route::resource('cursos', CursoController::class);
+        Route::resource('cursos.materias', MateriaController::class);
+        Route::resource('materias.periodos', PeriodoController::class);
+        Route::resource('periodos.horarios', HorarioController::class);
+        Route::resource('horarios.actividades', ActividadController::class);
+        Route::resource('actividades.notas', NotaController::class)->except(['show']);
     });
 });
