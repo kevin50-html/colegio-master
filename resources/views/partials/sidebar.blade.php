@@ -42,19 +42,9 @@
                     <i class="fas fa-user-shield me-2"></i>Roles y Permisos
                 </a>
             @endif
-            @if($rolActual->tienePermiso('gestionar_materias'))
-                <a class="nav-link" href="#">
-                    <i class="fas fa-book-open me-2"></i>Materias
-                </a>
-            @endif
-            @if($rolActual->tienePermiso('gestionar_cursos'))
-                <a class="nav-link" href="#">
-                    <i class="fas fa-layer-group me-2"></i>Cursos
-                </a>
-            @endif
-            @if($rolActual->tienePermiso('gestionar_horarios'))
-                <a class="nav-link" href="#">
-                    <i class="fas fa-calendar-alt me-2"></i>Horarios
+            @if($rolActual->tienePermiso('gestionar_cursos') || $rolActual->tienePermiso('gestionar_materias') || $rolActual->tienePermiso('gestionar_periodos') || $rolActual->tienePermiso('gestionar_horarios') || $rolActual->tienePermiso('crear_actividades') || $rolActual->tienePermiso('registrar_notas') || $rolActual->tienePermiso('ver_cursos') || $rolActual->tienePermiso('ver_materias'))
+                <a class="nav-link {{ $menuActivo === 'academico' ? 'active' : '' }}" href="{{ route('academico.cursos.index') }}">
+                    <i class="fas fa-school me-2"></i>Gestión Académica
                 </a>
             @endif
             @if($rolActual->tienePermiso('gestionar_disciplina'))

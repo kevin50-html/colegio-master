@@ -1,0 +1,68 @@
+@extends('layouts.app')
+
+@section('title', 'Nueva Actividad - ' . $horario->dia_semana)
+
+@section('content')
+@php
+    $menuActivo = 'academico';
+@endphp
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3 col-lg-2 p-0">
+            @include('partials.sidebar', ['menuActivo' => $menuActivo])
+        </div>
+        <div class="col-md-9 col-lg-10">
+            <div class="main-content p-4">
+                <div class="mb-4">
+                    <a href="{{ route('academico.periodos.horarios.show', [$horario->periodo, $horario]) }}" class="btn btn-link text-decoration-none p-0">
+                        <i class="fas fa-arrow-left me-1"></i>Volver al horario
+                    </a>
+                </div>
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h2 class="h5 mb-0">Nueva actividad</h2>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ route('academico.horarios.actividades.store', $horario) }}" method="POST" class="row g-3">
+                            @csrf
+                            <div class="col-md-6">
+                                <label for="titulo" class="form-label">Título</label>
+                                <input type="text" name="titulo" id="titulo" class="form-control @error('titulo') is-invalid @enderror" value="{{ old('titulo') }}" required>
+                                @error('titulo')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-3">
+                                <label for="fecha_entrega" class="form-label">Fecha de entrega</label>
+                                <input type="date" name="fecha_entrega" id="fecha_entrega" class="form-control @error('fecha_entrega') is-invalid @enderror" value="{{ old('fecha_entrega') }}">
+                                @error('fecha_entrega')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-3">
+                                <label for="porcentaje" class="form-label">Porcentaje</label>
+                                <input type="number" name="porcentaje" id="porcentaje" class="form-control @error('porcentaje') is-invalid @enderror" value="{{ old('porcentaje') }}" min="0" max="100">
+                                @error('porcentaje')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-12">
+                                <label for="descripcion" class="form-label">Descripción</label>
+                                <textarea name="descripcion" id="descripcion" rows="4" class="form-control @error('descripcion') is-invalid @enderror" placeholder="Instrucciones, rúbricas, observaciones...">{{ old('descripcion') }}</textarea>
+                                @error('descripcion')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Guardar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection

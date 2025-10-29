@@ -189,6 +189,14 @@
                                         </a>
                                     </div>
                                     @endif
+                                    @if($rol && ($rol->tienePermiso('gestionar_cursos') || $rol->tienePermiso('gestionar_materias') || $rol->tienePermiso('gestionar_periodos') || $rol->tienePermiso('gestionar_horarios') || $rol->tienePermiso('crear_actividades') || $rol->tienePermiso('registrar_notas') || $rol->tienePermiso('acceso_total')))
+                                    <div class="col-md-4 mb-3">
+                                        <a href="{{ route('academico.cursos.index') }}" class="btn btn-outline-primary btn-lg w-100">
+                                            <i class="fas fa-school me-2"></i>
+                                            Gestión Académica
+                                        </a>
+                                    </div>
+                                    @endif
                                     @if($rol && $rol->tienePermiso('ver_reportes_generales'))
                                     <div class="col-md-4 mb-3">
                                         <a href="#" class="btn btn-outline-primary btn-lg w-100">
