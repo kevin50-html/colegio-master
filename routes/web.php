@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CrearUsuario;
 use App\Http\Controllers\RolController;
+use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\MatriculaAcudienteController;
 
 // Ruta raíz redirige al login
@@ -25,6 +26,17 @@ Route::post('/register', [CrearUsuario::class, 'register']);
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
     
+    // Rutas de gestión de usuarios
+    Route::prefix('usuarios')->name('usuarios.')->group(function () {
+        Route::get('/', [UsuarioController::class, 'index'])->name('index');
+        Route::get('/crear', [UsuarioController::class, 'crear'])->name('crear');
+        Route::post('/', [UsuarioController::class, 'guardar'])->name('guardar');
+        Route::get('/{usuario}', [UsuarioController::class, 'mostrar'])->name('mostrar');
+        Route::get('/{usuario}/editar', [UsuarioController::class, 'editar'])->name('editar');
+        Route::put('/{usuario}', [UsuarioController::class, 'actualizar'])->name('actualizar');
+        Route::delete('/{usuario}', [UsuarioController::class, 'eliminar'])->name('eliminar');
+    });
+
     // Rutas de gestión de roles
     Route::prefix('roles')->name('roles.')->group(function () {
         // Rutas web principales
