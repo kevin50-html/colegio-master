@@ -44,6 +44,50 @@ class User extends Authenticatable
     }
 
     /**
+     * Determine if the user has a specific permission through their role.
+     */
+    public function hasPermission(string $permiso): bool
+    {
+        $rol = $this->rol;
+
+        if (!$rol) {
+            return false;
+        }
+
+        if ($rol->tienePermiso('acceso_total')) {
+            return true;
+        }
+
+        return $rol->tienePermiso($permiso);
+    }
+
+    /**
+     * Determine if the user has any permission from the provided list.
+     *
+     * @param  array<int, string>  $permisos
+     */
+    public function hasAnyPermission(array $permisos): bool
+    {
+        $rol = $this->rol;
+
+        if (!$rol) {
+            return false;
+        }
+
+        if ($rol->tienePermiso('acceso_total')) {
+            return true;
+        }
+
+        foreach ($permisos as $permiso) {
+            if ($rol->tienePermiso($permiso)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

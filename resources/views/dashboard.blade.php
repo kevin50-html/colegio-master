@@ -165,10 +165,17 @@
                                             Nueva Matrícula
                                         </a>
                                     </div>
-                                    @endif
-                                    @if($rol && $rol->tienePermiso('gestionar_estudiantes'))
+                                    @elseif($rol && ($rol->tienePermiso('gestionar_estudiantes') || $rol->tienePermiso('matricular_estudiantes') || $rol->tienePermiso('acceso_total')))
                                     <div class="col-md-4 mb-3">
-                                        <a href="#" class="btn btn-primary btn-lg w-100">
+                                        <a href="{{ route('matriculas.crear') }}" class="btn btn-primary btn-lg w-100">
+                                            <i class="fas fa-user-check me-2"></i>
+                                            Registrar Matrícula
+                                        </a>
+                                    </div>
+                                    @endif
+                                    @if($rol && ($rol->tienePermiso('gestionar_estudiantes') || $rol->tienePermiso('acceso_total')))
+                                    <div class="col-md-4 mb-3">
+                                        <a href="{{ route('estudiantes.crear') }}" class="btn btn-primary btn-lg w-100">
                                             <i class="fas fa-user-plus me-2"></i>
                                             Nuevo Estudiante
                                         </a>

@@ -17,14 +17,19 @@
             </a>
         @endif
         @if($rolActual)
-            @if($rolActual->tienePermiso('gestionar_usuarios'))
+            @if($rolActual->tienePermiso('gestionar_usuarios') || $rolActual->tienePermiso('acceso_total'))
                 <a class="nav-link {{ $menuActivo === 'usuarios' ? 'active' : '' }}" href="{{ route('usuarios.index') }}">
                     <i class="fas fa-users-cog me-2"></i>Gestión de Usuarios
                 </a>
             @endif
-            @if($rolActual->tienePermiso('gestionar_estudiantes'))
-                <a class="nav-link" href="#">
+            @if($rolActual->tienePermiso('gestionar_estudiantes') || $rolActual->tienePermiso('ver_estudiantes') || $rolActual->tienePermiso('acceso_total'))
+                <a class="nav-link {{ $menuActivo === 'estudiantes' ? 'active' : '' }}" href="{{ route('estudiantes.index') }}">
                     <i class="fas fa-user-graduate me-2"></i>Estudiantes
+                </a>
+            @endif
+            @if($rolActual->tienePermiso('gestionar_estudiantes') || $rolActual->tienePermiso('matricular_estudiantes') || $rolActual->tienePermiso('acceso_total'))
+                <a class="nav-link {{ $menuActivo === 'matriculas' && $rolActual->nombre !== 'Acudiente' ? 'active' : '' }}" href="{{ route('matriculas.index') }}">
+                    <i class="fas fa-user-check me-2"></i>Matrículas
                 </a>
             @endif
             @if($rolActual->tienePermiso('gestionar_docentes'))
@@ -35,11 +40,6 @@
             @if($rolActual->tienePermiso('gestionar_roles'))
                 <a class="nav-link {{ $menuActivo === 'roles' ? 'active' : '' }}" href="{{ route('roles.index') }}">
                     <i class="fas fa-user-shield me-2"></i>Roles y Permisos
-                </a>
-            @endif
-            @if($rolActual->tienePermiso('matricular_estudiantes'))
-                <a class="nav-link" href="#">
-                    <i class="fas fa-user-check me-2"></i>Matricular Estudiantes
                 </a>
             @endif
             @if($rolActual->tienePermiso('gestionar_materias'))

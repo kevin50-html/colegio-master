@@ -5,35 +5,52 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\MatriculaAcudiente;
 use App\Models\RolesModel;
+use App\Models\Estudiante;
+use App\Models\Curso;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class MatriculaAcudienteController extends Controller
 {
-    // Mostrar formulario de nueva matrícula por acudiente
-    public function crear()
+    /**
+     * Mostrar formulario de creación de matrícula.
+     */
+    public function crear(): View|RedirectResponse
     {
         $usuario = Auth::user();
-        $rol = RolesModel::find($usuario->roles_id);
-        if (!$rol || $rol->nombre !== 'Acudiente') {
+        $rol = $usuario?->rol ?? ($usuario?->roles_id ? RolesModel::find($usuario->roles_id) : null);
+
+        $puedeGestionar = $this->puedeGestionarMatrículas($usuario);
+        $esAcudiente = $rol && $rol->nombre === 'Acudiente';
+
+        if (!$esAcudiente && !$puedeGestionar) {
             return redirect()->route('dashboard')->with('error', 'No tienes permisos para acceder a esta sección.');
         }
 
-        $cursos = \DB::table('cursos')->orderBy('nombre')->get();
-        return view('matriculas.crear', compact('cursos'));
+        $cursos = Curso::orderBy('nombre')->get();
+
+        return view('matriculas.crear', compact('cursos', 'esAcudiente'));
     }
 
-    // Guardar la matrícula y subir documentos al FTP
-    public function guardar(Request $request)
+    /**
+     * Guardar una matrícula y cargar sus documentos.
+     */
+    public function guardar(Request $request): RedirectResponse
     {
         $usuario = Auth::user();
-        $rol = RolesModel::find($usuario->roles_id);
-        if (!$rol || $rol->nombre !== 'Acudiente') {
+        $rol = $usuario?->rol ?? ($usuario?->roles_id ? RolesModel::find($usuario->roles_id) : null);
+
+        $puedeGestionar = $this->puedeGestionarMatrículas($usuario);
+        $esAcudiente = $rol && $rol->nombre === 'Acudiente';
+
+        if (!$esAcudiente && !$puedeGestionar) {
             return redirect()->route('dashboard')->with('error', 'No tienes permisos para realizar esta acción.');
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'curso_id' => 'required|exists:cursos,id',
             'nombres' => 'required|string|max:255',
             'apellidos' => 'required|string|max:255',
@@ -59,39 +76,166 @@ class MatriculaAcudienteController extends Controller
 
         MatriculaAcudiente::create([
             'user_id' => $usuario->id,
-            'curso_id' => $request->input('curso_id'),
-            'nombres' => $request->input('nombres'),
-            'apellidos' => $request->input('apellidos'),
-            'documento_identidad' => $request->input('documento_identidad'),
-            'email' => $request->input('email'),
-            'telefono' => $request->input('telefono'),
+            'curso_id' => $validated['curso_id'],
+            'nombres' => $validated['nombres'],
+            'apellidos' => $validated['apellidos'],
+            'documento_identidad' => $validated['documento_identidad'],
+            'email' => $validated['email'] ?? null,
+            'telefono' => $validated['telefono'] ?? null,
             'documentos' => $rutasDocumentos,
             'estado' => 'pendiente',
         ]);
 
-        return redirect()->route('matriculas.crear')->with('success', 'Matrícula enviada correctamente.');
+        $ruta = $puedeGestionar ? 'matriculas.index' : 'matriculas.crear';
+
+        return redirect()->route($ruta)->with('success', 'Matrícula registrada correctamente.');
     }
 
-    // Listado de matrículas del acudiente
-    public function listar()
+    /**
+     * Listado de matrículas.
+     */
+    public function listar(Request $request): View|RedirectResponse
     {
         $usuario = Auth::user();
-        $matriculas = MatriculaAcudiente::where('user_id', $usuario->id)->orderByDesc('created_at')->paginate(10);
-        return view('matriculas.index', compact('matriculas'));
+
+        if ($this->puedeGestionarMatrículas($usuario)) {
+            $busqueda = trim((string) $request->input('q'));
+            $estado = $request->input('estado', 'todos');
+
+            $matriculas = MatriculaAcudiente::with(['curso', 'acudiente', 'estudianteRegistro'])
+                ->when($busqueda !== '', function ($query) use ($busqueda) {
+                    $query->where(function ($sub) use ($busqueda) {
+                        $sub->where('nombres', 'like', "%{$busqueda}%")
+                            ->orWhere('apellidos', 'like', "%{$busqueda}%")
+                            ->orWhere('documento_identidad', 'like', "%{$busqueda}%")
+                            ->orWhere('email', 'like', "%{$busqueda}%");
+                    });
+                })
+                ->when($estado !== 'todos', function ($query) use ($estado) {
+                    $query->where('estado', $estado);
+                })
+                ->orderByDesc('created_at')
+                ->paginate(15)
+                ->withQueryString();
+
+            $estadosDisponibles = [
+                'todos' => 'Todas',
+                'pendiente' => 'Pendientes',
+                'aprobada' => 'Aprobadas',
+                'rechazada' => 'Rechazadas',
+            ];
+
+            return view('matriculas.gestionar', [
+                'matriculas' => $matriculas,
+                'busqueda' => $busqueda,
+                'estadoSeleccionado' => $estado,
+                'estadosDisponibles' => $estadosDisponibles,
+            ]);
+        }
+
+        $rol = $usuario?->rol ?? ($usuario?->roles_id ? RolesModel::find($usuario->roles_id) : null);
+        if ($rol && $rol->nombre === 'Acudiente') {
+            $matriculas = MatriculaAcudiente::where('user_id', $usuario->id)
+                ->orderByDesc('created_at')
+                ->paginate(10);
+
+            return view('matriculas.index', compact('matriculas'));
+        }
+
+        return redirect()->route('dashboard')->with('error', 'No tienes permisos para ver las matrículas.');
     }
 
-    // Mostrar detalle de una matrícula
-    public function mostrar(MatriculaAcudiente $matricula)
+    /**
+     * Mostrar detalle de una matrícula.
+     */
+    public function mostrar(MatriculaAcudiente $matricula): View|RedirectResponse
     {
         $usuario = Auth::user();
-        $rol = RolesModel::find($usuario->roles_id);
-        if ($matricula->user_id !== $usuario->id && (!$rol || !$rol->tienePermiso('ver_matriculas_otros'))) {
+
+        $puedeGestionar = $this->puedeGestionarMatrículas($usuario);
+
+        if ($matricula->user_id !== $usuario->id && !$puedeGestionar) {
             return redirect()->route('matriculas.index')->with('error', 'No autorizado.');
         }
-        return view('matriculas.mostrar', compact('matricula'));
+
+        return view('matriculas.mostrar', [
+            'matricula' => $matricula->load(['curso', 'acudiente', 'estudianteRegistro']),
+            'puedeGestionar' => $puedeGestionar,
+            'cursos' => $puedeGestionar ? Curso::orderBy('nombre')->get() : collect(),
+        ]);
     }
 
-    // Descargar un documento desde FTP
+    /**
+     * Actualizar el estado de la matrícula (aprobar / rechazar).
+     */
+    public function actualizarEstado(Request $request, MatriculaAcudiente $matricula): RedirectResponse
+    {
+        $usuario = Auth::user();
+
+        if (!$this->puedeGestionarMatrículas($usuario)) {
+            return redirect()->route('matriculas.index')->with('error', 'No tienes permisos para actualizar matrículas.');
+        }
+
+        $data = $request->validate([
+            'estado' => 'required|string|in:pendiente,aprobada,rechazada',
+            'curso_id' => 'nullable|exists:cursos,id',
+            'fecha_matricula' => 'nullable|date',
+            'observaciones' => 'nullable|string',
+        ]);
+
+        $estado = $data['estado'];
+        $cursoId = $data['curso_id'] ?? $matricula->curso_id;
+        $fechaMatricula = $data['fecha_matricula'] ?? null;
+
+        if ($estado === 'aprobada' && !$cursoId) {
+            return back()->withInput()->with('error', 'Debes asignar un curso para aprobar la matrícula.');
+        }
+
+        if ($estado === 'aprobada') {
+            $estudiante = Estudiante::updateOrCreate(
+                ['documento_identidad' => $matricula->documento_identidad],
+                [
+                    'nombres' => $matricula->nombres,
+                    'apellidos' => $matricula->apellidos,
+                    'email' => $matricula->email,
+                    'telefono' => $matricula->telefono,
+                    'curso_id' => $cursoId,
+                    'fecha_matricula' => $fechaMatricula ?: now()->toDateString(),
+                    'estado' => 'activo',
+                ]
+            );
+
+            if (!empty($data['observaciones'])) {
+                $estudiante->observaciones = $data['observaciones'];
+            }
+
+            $estudiante->save();
+
+            $matricula->estudiante_registro_id = $estudiante->id;
+        }
+
+        if ($estado !== 'aprobada') {
+            $matricula->estudiante_registro_id = $estado === 'pendiente' ? $matricula->estudiante_registro_id : null;
+        }
+
+        if ($cursoId) {
+            $matricula->curso_id = $cursoId;
+        }
+
+        $matricula->estado = $estado;
+        $matricula->save();
+
+        if (isset($estudiante)) {
+            $estudiante->refresh();
+        }
+
+        return redirect()->route('matriculas.mostrar', $matricula)
+            ->with('success', 'Estado de la matrícula actualizado correctamente.');
+    }
+
+    /**
+     * Descargar un documento desde el almacenamiento configurado.
+     */
     public function descargarDocumento($ruta)
     {
         $ruta = urldecode($ruta);
@@ -106,5 +250,13 @@ class MatriculaAcudienteController extends Controller
             ]);
         }
         return redirect()->back()->with('error', 'Archivo no encontrado.');
+    }
+
+    private function puedeGestionarMatrículas($usuario): bool
+    {
+        return $usuario && $usuario->hasAnyPermission([
+            'gestionar_estudiantes',
+            'matricular_estudiantes',
+        ]);
     }
 }

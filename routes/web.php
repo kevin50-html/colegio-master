@@ -6,6 +6,7 @@ use App\Http\Controllers\CrearUsuario;
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\MatriculaAcudienteController;
+use App\Http\Controllers\EstudianteController;
 
 // Ruta raíz redirige al login
 Route::get('/', function () {
@@ -37,6 +38,17 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{usuario}', [UsuarioController::class, 'eliminar'])->name('eliminar');
     });
 
+    // Rutas de gestión de estudiantes
+    Route::prefix('estudiantes')->name('estudiantes.')->group(function () {
+        Route::get('/', [EstudianteController::class, 'index'])->name('index');
+        Route::get('/crear', [EstudianteController::class, 'crear'])->name('crear');
+        Route::post('/', [EstudianteController::class, 'guardar'])->name('guardar');
+        Route::get('/{estudiante}', [EstudianteController::class, 'mostrar'])->name('mostrar');
+        Route::get('/{estudiante}/editar', [EstudianteController::class, 'editar'])->name('editar');
+        Route::put('/{estudiante}', [EstudianteController::class, 'actualizar'])->name('actualizar');
+        Route::delete('/{estudiante}', [EstudianteController::class, 'eliminar'])->name('eliminar');
+    });
+
     // Rutas de gestión de roles
     Route::prefix('roles')->name('roles.')->group(function () {
         // Rutas web principales
@@ -62,5 +74,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/guardar', [MatriculaAcudienteController::class, 'guardar'])->name('guardar');
         Route::get('/{matricula}', [MatriculaAcudienteController::class, 'mostrar'])->name('mostrar');
         Route::get('/descargar/{ruta}', [MatriculaAcudienteController::class, 'descargarDocumento'])->name('descargar');
+        Route::patch('/{matricula}/estado', [MatriculaAcudienteController::class, 'actualizarEstado'])->name('actualizarEstado');
     });
 });
