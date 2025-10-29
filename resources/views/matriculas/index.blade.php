@@ -9,6 +9,13 @@
         <a class="btn btn-primary" href="{{ route('matriculas.crear') }}">Nueva Matrícula</a>
     </div>
 
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+
     @if ($matriculas->count() === 0)
         <div class="alert alert-info">Aún no has registrado matrículas.</div>
     @else

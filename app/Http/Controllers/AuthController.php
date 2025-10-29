@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Models\MatriculaAcudiente;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -38,7 +39,22 @@ class AuthController extends Controller
     // Mostrar dashboard/menú principal
     public function dashboard()
     {
-        return view('dashboard');
+        $usuario = Auth::user();
+        $rol = $usuario?->rol;
+
+        $pendientesMatriculas = 0;
+
+        if ($rol && $rol->nombre === 'Acudiente') {
+            $pendientesMatriculas = MatriculaAcudiente::where('user_id', $usuario->id)
+                ->where('estado', 'pendiente')
+                ->count();
+        }
+
+        return view('dashboard', [
+            'usuario' => $usuario,
+            'rol' => $rol,
+            'pendientesMatriculas' => $pendientesMatriculas,
+        ]);
     }
 
     // Procesar logout

@@ -6,31 +6,28 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class MatriculaAcudiente extends Model
+class Estudiante extends Model
 {
     use HasFactory;
 
-    protected $table = 'matriculas_acudientes';
-
     protected $fillable = [
         'user_id',
-        'estudiante_id',
-        'estudiante_registro_id',
         'curso_id',
         'nombres',
         'apellidos',
         'documento_identidad',
         'email',
         'telefono',
-        'documentos',
+        'fecha_matricula',
         'estado',
+        'observaciones',
     ];
 
     protected $casts = [
-        'documentos' => 'array',
+        'fecha_matricula' => 'date',
     ];
 
-    public function acudiente(): BelongsTo
+    public function usuario(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
@@ -40,13 +37,8 @@ class MatriculaAcudiente extends Model
         return $this->belongsTo(Curso::class, 'curso_id');
     }
 
-    public function estudiante(): BelongsTo
+    public function getNombreCompletoAttribute(): string
     {
-        return $this->belongsTo(User::class, 'estudiante_id');
-    }
-
-    public function estudianteRegistro(): BelongsTo
-    {
-        return $this->belongsTo(Estudiante::class, 'estudiante_registro_id');
+        return trim($this->nombres . ' ' . $this->apellidos);
     }
 }
