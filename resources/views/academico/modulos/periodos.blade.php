@@ -67,22 +67,29 @@
                         </thead>
                         <tbody>
                             @forelse($periodos as $periodo)
+                                @php
+                                    $cursoMateria = $periodo->cursoMateria;
+                                @endphp
                                 <tr>
                                     <td>{{ $periodo->nombre }}</td>
-                                    <td>{{ $periodo->cursoMateria->curso->nombre }}</td>
-                                    <td>{{ $periodo->cursoMateria->materia->nombre }}</td>
+                                    <td>{{ $cursoMateria?->curso?->nombre ?? 'Sin asignar' }}</td>
+                                    <td>{{ $cursoMateria?->materia?->nombre ?? 'Sin asignar' }}</td>
                                     <td>
                                         {{ optional($periodo->fecha_inicio)->format('Y-m-d') ?? '—' }} –
                                         {{ optional($periodo->fecha_fin)->format('Y-m-d') ?? '—' }}
                                     </td>
                                     <td><span class="badge bg-primary-subtle text-primary fw-normal">{{ $periodo->actividades_count }}</span></td>
                                     <td class="text-end">
-                                        <a href="{{ route('academico.curso-materias.periodos.show', [$periodo->cursoMateria, $periodo]) }}" class="btn btn-info btn-sm me-1">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="{{ route('academico.curso-materias.periodos.edit', [$periodo->cursoMateria, $periodo]) }}" class="btn btn-warning btn-sm">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
+                                        @if($cursoMateria)
+                                            <a href="{{ route('academico.curso-materias.periodos.show', [$cursoMateria, $periodo]) }}" class="btn btn-info btn-sm me-1">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ route('academico.curso-materias.periodos.edit', [$cursoMateria, $periodo]) }}" class="btn btn-warning btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        @else
+                                            <span class="text-muted small">Sin asignación de curso/materia</span>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty
