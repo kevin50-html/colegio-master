@@ -181,9 +181,9 @@
                                         </a>
                                     </div>
                                     @endif
-                                    @if($rol && $rol->tienePermiso('gestionar_docentes'))
+                                    @if($rol && ($rol->tienePermiso('gestionar_docentes') || $rol->tienePermiso('acceso_total')))
                                     <div class="col-md-4 mb-3">
-                                        <a href="#" class="btn btn-outline-primary btn-lg w-100">
+                                        <a href="{{ route('docentes.crear') }}" class="btn btn-outline-primary btn-lg w-100">
                                             <i class="fas fa-chalkboard-teacher me-2"></i>
                                             Nuevo Docente
                                         </a>

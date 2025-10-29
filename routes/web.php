@@ -7,6 +7,7 @@ use App\Http\Controllers\RolController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\MatriculaAcudienteController;
 use App\Http\Controllers\EstudianteController;
+use App\Http\Controllers\DocenteController;
 
 // Ruta raíz redirige al login
 Route::get('/', function () {
@@ -47,6 +48,17 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{estudiante}/editar', [EstudianteController::class, 'editar'])->name('editar');
         Route::put('/{estudiante}', [EstudianteController::class, 'actualizar'])->name('actualizar');
         Route::delete('/{estudiante}', [EstudianteController::class, 'eliminar'])->name('eliminar');
+    });
+
+    // Rutas de gestión de docentes
+    Route::prefix('docentes')->name('docentes.')->group(function () {
+        Route::get('/', [DocenteController::class, 'index'])->name('index');
+        Route::get('/crear', [DocenteController::class, 'crear'])->name('crear');
+        Route::post('/', [DocenteController::class, 'guardar'])->name('guardar');
+        Route::get('/{docente}', [DocenteController::class, 'mostrar'])->name('mostrar');
+        Route::get('/{docente}/editar', [DocenteController::class, 'editar'])->name('editar');
+        Route::put('/{docente}', [DocenteController::class, 'actualizar'])->name('actualizar');
+        Route::delete('/{docente}', [DocenteController::class, 'eliminar'])->name('eliminar');
     });
 
     // Rutas de gestión de roles

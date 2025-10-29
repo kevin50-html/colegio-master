@@ -32,8 +32,8 @@
                     <i class="fas fa-user-check me-2"></i>Matrículas
                 </a>
             @endif
-            @if($rolActual->tienePermiso('gestionar_docentes'))
-                <a class="nav-link" href="#">
+            @if($rolActual->tienePermiso('gestionar_docentes') || $rolActual->tienePermiso('ver_docentes') || $rolActual->tienePermiso('acceso_total'))
+                <a class="nav-link {{ $menuActivo === 'docentes' ? 'active' : '' }}" href="{{ route('docentes.index') }}">
                     <i class="fas fa-chalkboard-teacher me-2"></i>Docentes
                 </a>
             @endif
