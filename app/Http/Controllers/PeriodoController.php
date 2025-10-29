@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CursoMateria;
+use App\Models\Horario;
 use App\Models\Periodo;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -83,7 +84,10 @@ class PeriodoController extends Controller
     {
         $this->validarPertenencia($cursoMateria, $periodo);
 
-        $periodo->load(['horarios' => fn ($query) => $query->orderBy('dia'), 'actividades' => fn ($query) => $query->orderBy('fecha_entrega')]);
+        $periodo->load([
+            'horarios' => fn ($query) => $query->orderBy(Horario::diaColumn()),
+            'actividades' => fn ($query) => $query->orderBy('fecha_entrega'),
+        ]);
 
         return view('academico.periodos.show', [
             'cursoMateria' => $cursoMateria->load(['curso', 'materia']),

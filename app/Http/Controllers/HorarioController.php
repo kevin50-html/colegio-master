@@ -23,7 +23,9 @@ class HorarioController extends Controller
             return redirect()->route('academico.cursos.materias.index', $cursoMateria->curso)->with('error', 'No tienes permisos para consultar los horarios.');
         }
 
-        $horarios = $cursoMateria->horarios()->with('periodo')->orderBy('dia')->orderBy('hora_inicio')->get();
+        $columnaDia = Horario::diaColumn();
+
+        $horarios = $cursoMateria->horarios()->with('periodo')->orderBy($columnaDia)->orderBy('hora_inicio')->get();
 
         return view('academico.horarios.index', [
             'cursoMateria' => $cursoMateria->load(['curso', 'materia']),
