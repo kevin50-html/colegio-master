@@ -79,9 +79,14 @@
                         </thead>
                         <tbody>
                             @forelse($horarios as $horario)
+                                @php
+                                    $cursoMateria = $horario->cursoMateria;
+                                    $cursoNombre = $cursoMateria?->curso?->nombre;
+                                    $materiaNombre = $cursoMateria?->materia?->nombre;
+                                @endphp
                                 <tr>
-                                    <td>{{ $horario->cursoMateria->curso->nombre }}</td>
-                                    <td>{{ $horario->cursoMateria->materia->nombre }}</td>
+                                    <td>{{ $cursoNombre ?? '—' }}</td>
+                                    <td>{{ $materiaNombre ?? '—' }}</td>
                                     <td>{{ $horario->periodo?->nombre ?? '—' }}</td>
                                     <td>{{ $horario->dia }}</td>
                                     <td>{{ $horario->hora_inicio }} – {{ $horario->hora_fin }}</td>
