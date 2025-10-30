@@ -31,7 +31,7 @@ class Periodo extends Model
 
     public function horarios(): HasMany
     {
-        return $this->hasMany(Horario::class, 'periodo_id')->orderBy('dia');
+        return $this->hasMany(Horario::class, 'periodo_id')->orderBy(Horario::diaColumn());
     }
 
     public function actividades(): HasMany
