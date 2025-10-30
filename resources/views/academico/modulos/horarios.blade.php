@@ -44,7 +44,10 @@
                         <select name="periodo_id" id="periodo_id" class="form-select">
                             <option value="">Todos</option>
                             @foreach($periodos as $periodo)
-                                <option value="{{ $periodo->id }}" @selected($periodoId == $periodo->id)>{{ $periodo->nombre }} ({{ $periodo->cursoMateria->materia->nombre }})</option>
+                                @php
+                                    $materiaNombre = $periodo->cursoMateria?->materia?->nombre;
+                                @endphp
+                                <option value="{{ $periodo->id }}" @selected($periodoId == $periodo->id)>{{ $periodo->nombre }}{{ $materiaNombre ? " ({$materiaNombre})" : '' }}</option>
                             @endforeach
                         </select>
                     </div>
