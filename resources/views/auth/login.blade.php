@@ -344,9 +344,11 @@
                                 Recordarme
                             </label>
                         </div>
-                        <a href="{{ route('password.request') }}" class="text-decoration-none" style="color: rgba(0, 221, 252, 0.85);">
-                            ¿Olvidaste tu contraseña?
-                        </a>
+                        @if (Route::has('password.request'))
+                            <a href="{{ route('password.request') }}" class="text-decoration-none" style="color: rgba(0, 221, 252, 0.85);">
+                                ¿Olvidaste tu contraseña?
+                            </a>
+                        @endif
                     </div>
 
                     <div class="d-grid">
@@ -357,10 +359,12 @@
                 </form>
 
                 <div class="text-center auth-footer mt-4">
-                    <small class="text-muted">
-                        ¿No tienes una cuenta?
-                        <a href="{{ route('register') }}" class="text-decoration-none">Regístrate aquí</a>
-                    </small>
+                    @if (Route::has('register'))
+                        <small class="text-muted">
+                            ¿No tienes una cuenta?
+                            <a href="{{ route('register') }}" class="text-decoration-none">Regístrate aquí</a>
+                        </small>
+                    @endif
                 </div>
             </div>
         </div>
