@@ -10,6 +10,7 @@ use App\Http\Controllers\EstudianteController;
 use App\Http\Controllers\DocenteController;
 use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\CursoController;
+use App\Http\Controllers\CursoMateriaController;
 
 // Ruta raíz redirige al login
 Route::get('/', function () {
@@ -93,4 +94,5 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('cursos', CursoController::class);
     Route::resource('materias', MateriaController::class);
+    Route::resource('curso-materias', CursoMateriaController::class);
 });
