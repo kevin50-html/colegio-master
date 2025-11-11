@@ -12,13 +12,9 @@ return new class extends Migration
             return;
         }
 
-        Schema::disableForeignKeyConstraints();
-
         Schema::table('materias', function (Blueprint $table) {
-            $table->dropColumn('curso_id');
+            $table->dropConstrainedForeignId('curso_id');
         });
-
-        Schema::enableForeignKeyConstraints();
     }
 
     public function down(): void
