@@ -54,6 +54,11 @@
             background: #f8f9fa;
             min-height: calc(100vh - 56px);
         }
+
+        .pagination svg {
+            width: 1rem;
+            height: 1rem;
+        }
     </style>
     
     @stack('styles')
