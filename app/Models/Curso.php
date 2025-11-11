@@ -23,6 +23,22 @@ class Curso extends Model
     }
 
     /**
+     * Students enrolled in the course.
+     */
+    public function estudiantes(): HasMany
+    {
+        return $this->hasMany(Estudiante::class, 'curso_id');
+    }
+
+    /**
+     * Enrollment requests associated with the course.
+     */
+    public function matriculas(): HasMany
+    {
+        return $this->hasMany(MatriculaAcudiente::class, 'curso_id');
+    }
+
+    /**
      * Subjects linked to the course through the pivot entity.
      */
     public function materias(): BelongsToMany

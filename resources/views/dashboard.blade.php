@@ -189,6 +189,14 @@
                                         </a>
                                     </div>
                                     @endif
+                                    @if($rol && ($rol->tienePermiso('gestionar_cursos') || $rol->tienePermiso('acceso_total')))
+                                    <div class="col-md-4 mb-3">
+                                        <a href="{{ route('cursos.index') }}" class="btn btn-outline-primary btn-lg w-100">
+                                            <i class="fas fa-layer-group me-2"></i>
+                                            Cursos
+                                        </a>
+                                    </div>
+                                    @endif
                                     @if($rol && ($rol->tienePermiso('gestionar_materias') || $rol->tienePermiso('ver_materias') || $rol->tienePermiso('acceso_total')))
                                     <div class="col-md-4 mb-3">
                                         <a href="{{ route('materias.index') }}" class="btn btn-outline-primary btn-lg w-100">

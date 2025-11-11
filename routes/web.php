@@ -9,6 +9,7 @@ use App\Http\Controllers\MatriculaAcudienteController;
 use App\Http\Controllers\EstudianteController;
 use App\Http\Controllers\DocenteController;
 use App\Http\Controllers\MateriaController;
+use App\Http\Controllers\CursoController;
 
 // Ruta raíz redirige al login
 Route::get('/', function () {
@@ -90,5 +91,6 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/{matricula}/estado', [MatriculaAcudienteController::class, 'actualizarEstado'])->name('actualizarEstado');
     });
 
+    Route::resource('cursos', CursoController::class);
     Route::resource('materias', MateriaController::class);
 });
