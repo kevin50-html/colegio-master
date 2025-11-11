@@ -9,7 +9,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasTable('materias') || !Schema::hasColumn('materias', 'curso_id')) {
+        if (!Schema::hasTable('materias') || !$this->columnExists('materias', 'curso_id')) {
             return;
         }
 
@@ -19,39 +19,35 @@ return new class extends Migration
             return;
         }
 
-        Schema::disableForeignKeyConstraints();
-
         Schema::table('materias', function (Blueprint $table) {
-            if (!Schema::hasColumn('materias', 'curso_id')) {
+            if (!$this->columnExists('materias', 'curso_id')) {
                 return;
             }
 
             try {
+                if (method_exists($table, 'dropConstrainedForeignId')) {
+                    $table->dropConstrainedForeignId('curso_id');
+
+                    return;
+                }
+
                 $table->dropForeign(['curso_id']);
             } catch (\Throwable $exception) {
-                // Ignore missing constraint definitions; the drop column below is the goal.
+                // The constraint might not exist anymore. Continue with the drop column attempt below.
             }
 
             $table->dropColumn('curso_id');
         });
-
-        Schema::enableForeignKeyConstraints();
     }
 
     public function down(): void
     {
-        if (!Schema::hasTable('materias') || Schema::hasColumn('materias', 'curso_id')) {
+        if (!Schema::hasTable('materias') || $this->columnExists('materias', 'curso_id')) {
             return;
         }
 
         if ($this->isSqliteConnection()) {
-            Schema::table('materias', function (Blueprint $table) {
-                if (Schema::hasColumn('materias', 'curso_id')) {
-                    return;
-                }
-
-                $table->foreignId('curso_id')->nullable();
-            });
+            $this->rebuildMateriasTableWithCursoId();
 
             return;
         }
@@ -66,42 +62,70 @@ return new class extends Migration
         return Schema::getConnection()->getDriverName() === 'sqlite';
     }
 
+    private function columnExists(string $table, string $column): bool
+    {
+        if (!Schema::hasTable($table)) {
+            return false;
+        }
+
+        if ($this->isSqliteConnection()) {
+            return collect(DB::select("PRAGMA table_info('{$table}')"))
+                ->pluck('name')
+                ->contains($column);
+        }
+
+        return Schema::hasColumn($table, $column);
+    }
+
     private function rebuildMateriasTableWithoutCursoId(): void
     {
-        Schema::disableForeignKeyConstraints();
+        DB::connection()->transaction(function () {
+            DB::statement('PRAGMA foreign_keys = OFF');
 
-        Schema::dropIfExists('materias_tmp');
+            DB::statement('CREATE TABLE materias_tmp (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                nombre VARCHAR(255) NOT NULL UNIQUE,
+                codigo VARCHAR(255) NULL UNIQUE,
+                intensidad_horaria INTEGER NULL,
+                descripcion TEXT NULL,
+                created_at DATETIME NULL,
+                updated_at DATETIME NULL
+            )');
 
-        Schema::create('materias_tmp', function (Blueprint $table) {
-            $table->id();
-            $table->string('nombre')->unique();
-            $table->string('codigo')->nullable()->unique();
-            $table->unsignedTinyInteger('intensidad_horaria')->nullable();
-            $table->text('descripcion')->nullable();
-            $table->timestamps();
+            DB::statement('INSERT INTO materias_tmp (id, nombre, codigo, intensidad_horaria, descripcion, created_at, updated_at)
+                SELECT id, nombre, codigo, intensidad_horaria, descripcion, created_at, updated_at FROM materias');
+
+            DB::statement('DROP TABLE materias');
+            DB::statement('ALTER TABLE materias_tmp RENAME TO materias');
+
+            DB::statement('PRAGMA foreign_keys = ON');
         });
+    }
 
-        DB::table('materias')->select([
-            'id',
-            'nombre',
-            'codigo',
-            'intensidad_horaria',
-            'descripcion',
-            'created_at',
-            'updated_at',
-        ])->orderBy('id')->chunk(100, function ($materias) {
-            $payload = $materias->map(function ($materia) {
-                return (array) $materia;
-            })->all();
+    private function rebuildMateriasTableWithCursoId(): void
+    {
+        DB::connection()->transaction(function () {
+            DB::statement('PRAGMA foreign_keys = OFF');
 
-            if (!empty($payload)) {
-                DB::table('materias_tmp')->insert($payload);
-            }
+            DB::statement('CREATE TABLE materias_tmp (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                nombre VARCHAR(255) NOT NULL UNIQUE,
+                codigo VARCHAR(255) NULL UNIQUE,
+                intensidad_horaria INTEGER NULL,
+                descripcion TEXT NULL,
+                curso_id INTEGER NULL,
+                created_at DATETIME NULL,
+                updated_at DATETIME NULL,
+                CONSTRAINT materias_curso_id_foreign FOREIGN KEY (curso_id) REFERENCES cursos(id) ON DELETE SET NULL
+            )');
+
+            DB::statement('INSERT INTO materias_tmp (id, nombre, codigo, intensidad_horaria, descripcion, curso_id, created_at, updated_at)
+                SELECT id, nombre, codigo, intensidad_horaria, descripcion, curso_id, created_at, updated_at FROM materias');
+
+            DB::statement('DROP TABLE materias');
+            DB::statement('ALTER TABLE materias_tmp RENAME TO materias');
+
+            DB::statement('PRAGMA foreign_keys = ON');
         });
-
-        Schema::drop('materias');
-        Schema::rename('materias_tmp', 'materias');
-
-        Schema::enableForeignKeyConstraints();
     }
 };
