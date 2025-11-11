@@ -7,15 +7,8 @@ use App\Http\Controllers\RolController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\MatriculaAcudienteController;
 use App\Http\Controllers\EstudianteController;
-use App\Http\Controllers\AcademicoModuleController;
-use App\Http\Controllers\ActividadController;
-use App\Http\Controllers\CursoController;
-use App\Http\Controllers\CursoMateriaController;
 use App\Http\Controllers\DocenteController;
-use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\MateriaController;
-use App\Http\Controllers\NotaController;
-use App\Http\Controllers\PeriodoController;
 
 // Ruta raíz redirige al login
 Route::get('/', function () {
@@ -97,28 +90,5 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/{matricula}/estado', [MatriculaAcudienteController::class, 'actualizarEstado'])->name('actualizarEstado');
     });
 
-    // Rutas de gestión académica modular
-    Route::prefix('academico')->name('academico.')->group(function () {
-        Route::get('/', [AcademicoModuleController::class, 'index'])->name('index');
-        Route::get('/modulos/materias', [AcademicoModuleController::class, 'materias'])->name('modulos.materias');
-        Route::get('/modulos/periodos', [AcademicoModuleController::class, 'periodos'])->name('modulos.periodos');
-        Route::get('/modulos/actividades', [AcademicoModuleController::class, 'actividades'])->name('modulos.actividades');
-        Route::get('/modulos/horarios', [AcademicoModuleController::class, 'horarios'])->name('modulos.horarios');
-        Route::get('/modulos/cursos-por-materias', [AcademicoModuleController::class, 'cursosPorMaterias'])->name('modulos.cursos-materias');
-
-        Route::resource('cursos', CursoController::class);
-        Route::resource('materias', MateriaController::class);
-
-        Route::prefix('cursos/{curso}')->name('cursos.')->group(function () {
-            Route::get('materias', [CursoMateriaController::class, 'index'])->name('materias.index');
-            Route::post('materias', [CursoMateriaController::class, 'store'])->name('materias.store');
-            Route::put('materias/{cursoMateria}', [CursoMateriaController::class, 'update'])->name('materias.update');
-            Route::delete('materias/{cursoMateria}', [CursoMateriaController::class, 'destroy'])->name('materias.destroy');
-        });
-
-        Route::resource('curso-materias.periodos', PeriodoController::class);
-        Route::resource('curso-materias.horarios', HorarioController::class)->except(['show']);
-        Route::resource('periodos.actividades', ActividadController::class);
-        Route::resource('actividades.notas', NotaController::class)->except(['show']);
-    });
+    Route::resource('materias', MateriaController::class);
 });
