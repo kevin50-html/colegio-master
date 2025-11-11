@@ -55,9 +55,27 @@
             min-height: calc(100vh - 56px);
         }
 
-        .pagination svg {
+        .pagination {
+            gap: 0.25rem;
+        }
+
+        .pagination .page-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 2.25rem;
+            min-height: 2.25rem;
+            font-size: 0.875rem;
+            line-height: 1;
+        }
+
+        .pagination .page-link svg {
             width: 1rem;
             height: 1rem;
+        }
+
+        .pagination .page-link span[aria-hidden="true"] {
+            font-size: 1rem;
         }
     </style>
     
