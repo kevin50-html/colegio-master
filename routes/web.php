@@ -13,6 +13,8 @@ use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\CursoController;
 use App\Http\Controllers\CursoMateriaController;
 use App\Http\Controllers\PeriodoController;
+use App\Http\Controllers\NotaController;
+use App\Http\Controllers\NotaConsultaController;
 
 // Ruta raíz redirige al login
 Route::get('/', function () {
@@ -107,4 +109,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('actividades/materias/{materia}', [ActividadController::class, 'materia'])->name('actividades.materia');
     Route::post('actividades/materias/{materia}', [ActividadController::class, 'store'])->name('actividades.store');
     Route::delete('actividades/{actividad}', [ActividadController::class, 'destroy'])->name('actividades.destroy');
+
+    Route::prefix('notas')->name('notas.')->group(function () {
+        Route::get('/', [NotaController::class, 'index'])->name('index');
+        Route::get('/cursos/{curso}', [NotaController::class, 'curso'])->name('curso');
+        Route::get('/cursos/{curso}/materias/{materia}', [NotaController::class, 'materia'])->name('materia');
+        Route::post('/cursos/{curso}/materias/{materia}/notas', [NotaController::class, 'guardar'])->name('guardar');
+    });
+
+    Route::prefix('consulta-notas')->name('consulta-notas.')->group(function () {
+        Route::get('/', [NotaConsultaController::class, 'index'])->name('index');
+        Route::get('/cursos/{curso}', [NotaConsultaController::class, 'curso'])->name('curso');
+        Route::get('/cursos/{curso}/materias/{materia}', [NotaConsultaController::class, 'materia'])->name('materia');
+    });
 });
