@@ -121,7 +121,7 @@
                                                     @endforeach
                                                     <td class="text-center">
                                                         @if($promedio !== null)
-                                                            <span class="badge @class(['bg-success' => $aprobado, 'bg-warning text-dark' => !$aprobado])">
+                                                            <span @class(['badge', 'text-dark', 'bg-success' => $aprobado, 'bg-warning' => !$aprobado])>
                                                                 {{ number_format($promedio, 2) }}
                                                             </span>
                                                             <div class="small text-muted mt-1">
@@ -173,7 +173,7 @@
                                                     @endphp
                                                     <td class="text-center">
                                                         @if($promedioPeriodo !== null)
-                                                            <span class="badge @class(['bg-success' => $aprobadoPeriodo, 'bg-warning text-dark' => !$aprobadoPeriodo])">
+                                                            <span @class(['badge', 'text-dark', 'bg-success' => $aprobadoPeriodo, 'bg-warning' => !$aprobadoPeriodo])>
                                                                 {{ number_format($promedioPeriodo, 2) }}
                                                             </span>
                                                             <div class="small text-muted">{{ $aprobadoPeriodo ? 'Aprobado' : 'En riesgo' }}</div>

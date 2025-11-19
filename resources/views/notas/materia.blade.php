@@ -126,7 +126,7 @@
                                                     @endforeach
                                                     <td class="text-center">
                                                         @if($promedio !== null)
-                                                            <span class="badge @class(['bg-success' => $aprobado, 'bg-warning text-dark' => !$aprobado])">
+                                                            <span @class(['badge', 'text-dark', 'bg-success' => $aprobado, 'bg-warning' => !$aprobado])>
                                                                 {{ number_format($promedio, 2) }}
                                                             </span>
                                                             <div class="small text-muted mt-1">
