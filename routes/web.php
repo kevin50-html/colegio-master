@@ -15,6 +15,7 @@ use App\Http\Controllers\CursoMateriaController;
 use App\Http\Controllers\PeriodoController;
 use App\Http\Controllers\NotaController;
 use App\Http\Controllers\NotaConsultaController;
+use App\Http\Controllers\HorarioController;
 
 // Ruta raíz redirige al login
 Route::get('/', function () {
@@ -99,6 +100,12 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('cursos', CursoController::class);
     Route::resource('materias', MateriaController::class);
     Route::resource('curso-materias', CursoMateriaController::class);
+    Route::prefix('horarios')->name('horarios.')->group(function () {
+        Route::get('/', [HorarioController::class, 'index'])->name('index');
+        Route::get('/cursos/{curso}', [HorarioController::class, 'curso'])->name('curso');
+        Route::post('/cursos/{curso}', [HorarioController::class, 'store'])->name('store');
+        Route::delete('/cursos/{curso}/bloques/{horario}', [HorarioController::class, 'destroy'])->name('destroy');
+    });
     Route::get('periodos', [PeriodoController::class, 'index'])->name('periodos.index');
     Route::get('periodos/materias/{materia}', [PeriodoController::class, 'materia'])->name('periodos.materia');
     Route::post('periodos/materias/{materia}', [PeriodoController::class, 'store'])->name('periodos.store');
