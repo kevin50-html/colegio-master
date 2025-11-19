@@ -48,6 +48,11 @@
                     <i class="fas fa-book-open me-2"></i>Materias por curso
                 </a>
             @endif
+            @if($rolActual->tienePermiso('gestionar_materias') || $rolActual->tienePermiso('acceso_total'))
+                <a class="nav-link {{ $menuActivo === 'actividades' ? 'active' : '' }}" href="{{ route('actividades.index') }}">
+                    <i class="fas fa-tasks me-2"></i>Actividades
+                </a>
+            @endif
             @if($rolActual->tienePermiso('gestionar_roles'))
                 <a class="nav-link {{ $menuActivo === 'roles' ? 'active' : '' }}" href="{{ route('roles.index') }}">
                     <i class="fas fa-user-shield me-2"></i>Roles y Permisos
