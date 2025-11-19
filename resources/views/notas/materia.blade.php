@@ -72,6 +72,9 @@
                                                         {{ $grupo->first()->periodo?->nombre ?? 'Sin periodo' }}
                                                     </th>
                                                 @endforeach
+                                                <th rowspan="2" class="align-middle text-center" style="min-width: 140px;">
+                                                    Promedio
+                                                </th>
                                             </tr>
                                             <tr>
                                                 @foreach($actividadesPorPeriodo as $grupo)
@@ -86,6 +89,15 @@
                                         </thead>
                                         <tbody>
                                             @foreach($estudiantes as $estudiante)
+                                                @php
+                                                    $valores = $actividades->map(function ($actividad) use ($notas, $estudiante) {
+                                                        $nota = $notas->get($estudiante->id . '-' . $actividad->id);
+                                                        return $nota?->valor;
+                                                    })->filter(fn ($valor) => $valor !== null);
+
+                                                    $promedio = $valores->isNotEmpty() ? round($valores->avg(), 2) : null;
+                                                    $aprobado = $promedio !== null && $promedio >= 3;
+                                                @endphp
                                                 <tr>
                                                     <td>
                                                         <div class="fw-semibold">{{ $estudiante->nombre_completo }}</div>
@@ -112,6 +124,18 @@
                                                             @endif
                                                         </td>
                                                     @endforeach
+                                                    <td class="text-center">
+                                                        @if($promedio !== null)
+                                                            <span class="badge @class(['bg-success' => $aprobado, 'bg-warning text-dark' => !$aprobado])">
+                                                                {{ number_format($promedio, 2) }}
+                                                            </span>
+                                                            <div class="small text-muted mt-1">
+                                                                {{ $aprobado ? 'Aprobado' : 'En riesgo' }}
+                                                            </div>
+                                                        @else
+                                                            <span class="text-muted">Sin notas</span>
+                                                        @endif
+                                                    </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>

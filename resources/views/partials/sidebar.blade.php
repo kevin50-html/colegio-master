@@ -59,6 +59,11 @@
                     <i class="fas fa-clipboard-check me-2"></i>Notas
                 </a>
             @endif
+            @if($rolActual->tienePermiso('ver_notas'))
+                <a class="nav-link {{ $menuActivo === 'notas-consulta' ? 'active' : '' }}" href="{{ route('consulta-notas.index') }}">
+                    <i class="fas fa-chart-line me-2"></i>Consulta de notas
+                </a>
+            @endif
             @if($rolActual->tienePermiso('gestionar_roles'))
                 <a class="nav-link {{ $menuActivo === 'roles' ? 'active' : '' }}" href="{{ route('roles.index') }}">
                     <i class="fas fa-user-shield me-2"></i>Roles y Permisos
