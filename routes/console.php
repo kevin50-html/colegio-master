@@ -1,8 +1,5 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
-
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+// Archivo intencionalmente sin comandos personalizados.
+// El comando "inspire" de Laravel se eliminó durante la limpieza de código muerto
+// porque no existe ningún flujo que lo utilice en este proyecto.
