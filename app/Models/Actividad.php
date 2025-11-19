@@ -14,6 +14,7 @@ class Actividad extends Model
     protected $table = 'actividades';
 
     protected $fillable = [
+        'horario_id',
         'periodo_id',
         'titulo',
         'fecha_entrega',
@@ -28,6 +29,11 @@ class Actividad extends Model
     public function periodo(): BelongsTo
     {
         return $this->belongsTo(Periodo::class, 'periodo_id');
+    }
+
+    public function horario(): BelongsTo
+    {
+        return $this->belongsTo(Horario::class, 'horario_id');
     }
 
     public function notas(): HasMany

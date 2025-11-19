@@ -27,4 +27,9 @@ class Materia extends Model
     {
         return $this->hasMany(CursoMateria::class, 'materia_id');
     }
+
+    public function periodos(): HasMany
+    {
+        return $this->hasMany(Periodo::class, 'materia_id')->orderBy('orden');
+    }
 }
