@@ -8,18 +8,21 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasTable('horarios')) {
-            Schema::create('horarios', function (Blueprint $table) {
-                $table->id();
-                $table->foreignId('periodo_id')->constrained('periodos')->cascadeOnDelete();
-                $table->string('dia_semana');
-                $table->time('hora_inicio');
-                $table->time('hora_fin');
-                $table->string('aula')->nullable();
-                $table->string('modalidad')->nullable();
-                $table->timestamps();
-            });
+        if (Schema::hasTable('horarios')) {
+            return;
         }
+
+        Schema::create('horarios', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('curso_materia_id')->constrained('curso_materia')->cascadeOnDelete();
+            $table->foreignId('periodo_id')->nullable()->constrained('periodos')->nullOnDelete();
+            $table->enum('dia', ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']);
+            $table->time('hora_inicio');
+            $table->time('hora_fin');
+            $table->string('aula')->nullable();
+            $table->timestamps();
+            $table->unique(['curso_materia_id', 'dia', 'hora_inicio', 'hora_fin'], 'horarios_curso_dia_intervalo_unique');
+        });
     }
 
     public function down(): void
