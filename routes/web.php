@@ -8,6 +8,7 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\MatriculaAcudienteController;
 use App\Http\Controllers\EstudianteController;
 use App\Http\Controllers\DocenteController;
+use App\Http\Controllers\ActividadController;
 use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\CursoController;
 use App\Http\Controllers\CursoMateriaController;
@@ -95,4 +96,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('cursos', CursoController::class);
     Route::resource('materias', MateriaController::class);
     Route::resource('curso-materias', CursoMateriaController::class);
+    Route::get('actividades', [ActividadController::class, 'index'])->name('actividades.index');
+    Route::get('actividades/materias/{materia}', [ActividadController::class, 'materia'])->name('actividades.materia');
+    Route::post('actividades/materias/{materia}', [ActividadController::class, 'store'])->name('actividades.store');
+    Route::delete('actividades/{actividad}', [ActividadController::class, 'destroy'])->name('actividades.destroy');
 });
