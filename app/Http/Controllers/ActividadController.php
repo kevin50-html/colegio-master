@@ -15,9 +15,8 @@ class ActividadController extends Controller
     {
         $materias = Materia::query()
             ->withCount([
-                'cursoMaterias as actividades_count' => function ($query) {
-                    $query->join('periodos', 'curso_materia.id', '=', 'periodos.curso_materia_id')
-                        ->join('actividades', 'periodos.id', '=', 'actividades.periodo_id');
+                'periodos as actividades_count' => function ($query) {
+                    $query->join('actividades', 'periodos.id', '=', 'actividades.periodo_id');
                 },
             ])
             ->orderBy('nombre')
@@ -31,19 +30,17 @@ class ActividadController extends Controller
     public function materia(Materia $materia): View
     {
         $periodos = Periodo::query()
-            ->whereHas('cursoMateria', function ($query) use ($materia) {
-                $query->where('materia_id', $materia->id);
-            })
-            ->with(['cursoMateria.curso'])
-            ->orderBy('curso_materia_id')
+            ->where('materia_id', $materia->id)
+            ->with('materia')
             ->orderBy('orden')
+            ->orderBy('nombre')
             ->get();
 
         $actividades = Actividad::query()
-            ->whereHas('periodo.cursoMateria', function ($query) use ($materia) {
+            ->whereHas('periodo', function ($query) use ($materia) {
                 $query->where('materia_id', $materia->id);
             })
-            ->with(['periodo.cursoMateria.curso'])
+            ->with('periodo')
             ->orderBy('fecha_entrega')
             ->orderBy('created_at')
             ->get();
@@ -67,9 +64,7 @@ class ActividadController extends Controller
 
         $periodo = Periodo::query()
             ->where('id', $data['periodo_id'])
-            ->whereHas('cursoMateria', function ($query) use ($materia) {
-                $query->where('materia_id', $materia->id);
-            })
+            ->where('materia_id', $materia->id)
             ->firstOrFail();
 
         Actividad::create([
@@ -88,7 +83,7 @@ class ActividadController extends Controller
     public function destroy(Actividad $actividad): RedirectResponse
     {
         $materia = Materia::query()
-            ->whereHas('cursoMaterias.periodos.actividades', function ($query) use ($actividad) {
+            ->whereHas('periodos.actividades', function ($query) use ($actividad) {
                 $query->where('actividades.id', $actividad->id);
             })
             ->first();

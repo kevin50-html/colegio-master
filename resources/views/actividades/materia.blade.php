@@ -33,7 +33,7 @@
                     <div class="card-body">
                         @if($periodos->isEmpty())
                             <div class="alert alert-info mb-0">
-                                No hay periodos configurados para esta materia en ningún curso.
+                                No hay periodos configurados para esta materia.
                             </div>
                         @else
                             <form action="{{ route('actividades.store', $materia) }}" method="POST" class="row g-3">
@@ -44,7 +44,7 @@
                                         <option value="">Selecciona un periodo</option>
                                         @foreach($periodos as $periodo)
                                             <option value="{{ $periodo->id }}" @selected(old('periodo_id') == $periodo->id)>
-                                                {{ $periodo->cursoMateria->curso->nombre }} - {{ $periodo->nombre }}
+                                                {{ $periodo->nombre }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -133,7 +133,7 @@
                                     <thead class="table-light">
                                         <tr>
                                             <th>Título</th>
-                                            <th>Curso / Periodo</th>
+                                            <th>Periodo</th>
                                             <th>Entrega</th>
                                             <th class="text-center">%</th>
                                             <th></th>
@@ -149,8 +149,8 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div class="fw-semibold">{{ $actividad->periodo->cursoMateria->curso->nombre }}</div>
-                                                    <div class="text-muted small">Periodo: {{ $actividad->periodo->nombre }}</div>
+                                                    <div class="fw-semibold">{{ $actividad->periodo->nombre }}</div>
+                                                    <div class="text-muted small">{{ $materia->nombre }}</div>
                                                 </td>
                                                 <td>{{ $actividad->fecha_entrega?->format('d/m/Y') ?? 'Sin fecha' }}</td>
                                                 <td class="text-center">{{ $actividad->porcentaje ? $actividad->porcentaje . '%' : 'N/D' }}</td>
