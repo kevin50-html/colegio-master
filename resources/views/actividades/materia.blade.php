@@ -43,9 +43,20 @@
                                     @else
                                         <ul class="list-group list-group-flush">
                                             @foreach($periodos as $periodo)
-                                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                    <span class="fw-semibold">{{ $periodo->nombre }}</span>
-                                                    <span class="text-muted small">Orden {{ $periodo->orden ?? '-' }}</span>
+                                                <li class="list-group-item">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <span class="fw-semibold">{{ $periodo->nombre }}</span>
+                                                        <span class="text-muted small">Orden {{ $periodo->orden ?? '-' }}</span>
+                                                    </div>
+                                                    <div class="text-muted small mt-1">
+                                                        @if($periodo->fecha_inicio || $periodo->fecha_fin)
+                                                            {{ optional($periodo->fecha_inicio)->format('d/m/Y') ?? 'Sin inicio' }}
+                                                            -
+                                                            {{ optional($periodo->fecha_fin)->format('d/m/Y') ?? 'Sin fin' }}
+                                                        @else
+                                                            Fechas no definidas
+                                                        @endif
+                                                    </div>
                                                 </li>
                                             @endforeach
                                         </ul>
