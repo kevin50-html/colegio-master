@@ -103,7 +103,10 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('horarios')->name('horarios.')->group(function () {
         Route::get('/', [HorarioController::class, 'index'])->name('index');
         Route::get('/cursos/{curso}', [HorarioController::class, 'curso'])->name('curso');
+        Route::get('/cursos/{curso}/consulta', [HorarioController::class, 'consulta'])->name('consulta');
         Route::post('/cursos/{curso}', [HorarioController::class, 'store'])->name('store');
+        Route::get('/cursos/{curso}/bloques/{horario}/editar', [HorarioController::class, 'edit'])->name('edit');
+        Route::put('/cursos/{curso}/bloques/{horario}', [HorarioController::class, 'update'])->name('update');
         Route::delete('/cursos/{curso}/bloques/{horario}', [HorarioController::class, 'destroy'])->name('destroy');
     });
     Route::get('periodos', [PeriodoController::class, 'index'])->name('periodos.index');

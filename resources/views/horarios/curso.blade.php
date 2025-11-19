@@ -21,7 +21,10 @@
                             <h1 class="h3 mb-1">{{ $curso->nombre }}</h1>
                             <p class="text-muted mb-0">Gestiona los bloques de clase y consulta el horario consolidado del curso.</p>
                         </div>
-                        <div class="d-flex gap-2">
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="{{ route('horarios.consulta', $curso) }}" class="btn btn-outline-primary">
+                                <i class="fas fa-eye me-1"></i> Vista de consulta
+                            </a>
                             <a href="{{ route('horarios.index') }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-arrow-left me-1"></i> Volver a cursos
                             </a>
@@ -209,13 +212,18 @@
                                                                                         <div class="text-muted small">Periodo: {{ $horario->periodo->nombre }}</div>
                                                                                     @endif
                                                                                 </div>
-                                                                                <form action="{{ route('horarios.destroy', ['curso' => $curso, 'horario' => $horario]) }}" method="POST" class="text-end" onsubmit="return confirm('¿Deseas eliminar este bloque horario?');">
-                                                                                    @csrf
-                                                                                    @method('DELETE')
-                                                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                                                        <i class="fas fa-trash"></i>
-                                                                                    </button>
-                                                                                </form>
+                                                                                <div class="d-flex gap-2">
+                                                                                    <a href="{{ route('horarios.edit', ['curso' => $curso, 'horario' => $horario]) }}" class="btn btn-sm btn-outline-primary" title="Editar bloque">
+                                                                                        <i class="fas fa-pen"></i>
+                                                                                    </a>
+                                                                                    <form action="{{ route('horarios.destroy', ['curso' => $curso, 'horario' => $horario]) }}" method="POST" class="text-end" onsubmit="return confirm('¿Deseas eliminar este bloque horario?');">
+                                                                                        @csrf
+                                                                                        @method('DELETE')
+                                                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                                            <i class="fas fa-trash"></i>
+                                                                                        </button>
+                                                                                    </form>
+                                                                                </div>
                                                                             </div>
                                                                         </li>
                                                                     @endforeach
