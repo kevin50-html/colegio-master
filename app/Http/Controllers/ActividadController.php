@@ -11,9 +11,17 @@ use Illuminate\View\View;
 
 class ActividadController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $busqueda = $request->string('buscar');
+
         $materias = Materia::query()
+            ->when($busqueda, function ($query) use ($busqueda) {
+                $query->where(function ($sub) use ($busqueda) {
+                    $sub->where('nombre', 'like', "%{$busqueda}%")
+                        ->orWhere('codigo', 'like', "%{$busqueda}%");
+                });
+            })
             ->withCount([
                 'periodos as actividades_count' => function ($query) {
                     $query->join('actividades', 'periodos.id', '=', 'actividades.periodo_id');
@@ -24,6 +32,7 @@ class ActividadController extends Controller
 
         return view('actividades.index', [
             'materias' => $materias,
+            'busqueda' => $busqueda,
         ]);
     }
 
@@ -50,6 +59,28 @@ class ActividadController extends Controller
             'periodos' => $periodos,
             'actividades' => $actividades,
         ]);
+    }
+
+    public function storePeriodo(Request $request, Materia $materia): RedirectResponse
+    {
+        $data = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'fecha_inicio' => 'nullable|date',
+            'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
+            'orden' => 'nullable|integer|min:1',
+        ]);
+
+        Periodo::create([
+            'materia_id' => $materia->id,
+            'nombre' => $data['nombre'],
+            'fecha_inicio' => $data['fecha_inicio'] ?? null,
+            'fecha_fin' => $data['fecha_fin'] ?? null,
+            'orden' => $data['orden'] ?? null,
+        ]);
+
+        return redirect()
+            ->route('actividades.materia', $materia)
+            ->with('success', 'Periodo registrado para la materia.');
     }
 
     public function store(Request $request, Materia $materia): RedirectResponse

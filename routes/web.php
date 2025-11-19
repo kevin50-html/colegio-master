@@ -98,6 +98,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('curso-materias', CursoMateriaController::class);
     Route::get('actividades', [ActividadController::class, 'index'])->name('actividades.index');
     Route::get('actividades/materias/{materia}', [ActividadController::class, 'materia'])->name('actividades.materia');
+    Route::post('actividades/materias/{materia}/periodos', [ActividadController::class, 'storePeriodo'])->name('actividades.periodos.store');
     Route::post('actividades/materias/{materia}', [ActividadController::class, 'store'])->name('actividades.store');
     Route::delete('actividades/{actividad}', [ActividadController::class, 'destroy'])->name('actividades.destroy');
 });
