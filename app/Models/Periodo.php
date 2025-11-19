@@ -12,7 +12,7 @@ class Periodo extends Model
     use HasFactory;
 
     protected $fillable = [
-        'curso_materia_id',
+        'materia_id',
         'nombre',
         'fecha_inicio',
         'fecha_fin',
@@ -24,9 +24,9 @@ class Periodo extends Model
         'fecha_fin' => 'date',
     ];
 
-    public function cursoMateria(): BelongsTo
+    public function materia(): BelongsTo
     {
-        return $this->belongsTo(CursoMateria::class, 'curso_materia_id');
+        return $this->belongsTo(Materia::class, 'materia_id');
     }
 
     public function horarios(): HasMany
