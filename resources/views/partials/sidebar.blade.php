@@ -49,6 +49,9 @@
                 </a>
             @endif
             @if($rolActual->tienePermiso('gestionar_materias') || $rolActual->tienePermiso('acceso_total'))
+                <a class="nav-link {{ $menuActivo === 'periodos' ? 'active' : '' }}" href="{{ route('periodos.index') }}">
+                    <i class="fas fa-calendar-alt me-2"></i>Períodos
+                </a>
                 <a class="nav-link {{ $menuActivo === 'actividades' ? 'active' : '' }}" href="{{ route('actividades.index') }}">
                     <i class="fas fa-tasks me-2"></i>Actividades
                 </a>

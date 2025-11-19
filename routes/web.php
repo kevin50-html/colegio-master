@@ -12,6 +12,7 @@ use App\Http\Controllers\ActividadController;
 use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\CursoController;
 use App\Http\Controllers\CursoMateriaController;
+use App\Http\Controllers\PeriodoController;
 
 // Ruta raíz redirige al login
 Route::get('/', function () {
@@ -96,6 +97,12 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('cursos', CursoController::class);
     Route::resource('materias', MateriaController::class);
     Route::resource('curso-materias', CursoMateriaController::class);
+    Route::get('periodos', [PeriodoController::class, 'index'])->name('periodos.index');
+    Route::get('periodos/materias/{materia}', [PeriodoController::class, 'materia'])->name('periodos.materia');
+    Route::post('periodos/materias/{materia}', [PeriodoController::class, 'store'])->name('periodos.store');
+    Route::get('periodos/{periodo}/editar', [PeriodoController::class, 'edit'])->name('periodos.edit');
+    Route::put('periodos/{periodo}', [PeriodoController::class, 'update'])->name('periodos.update');
+    Route::delete('periodos/{periodo}', [PeriodoController::class, 'destroy'])->name('periodos.destroy');
     Route::get('actividades', [ActividadController::class, 'index'])->name('actividades.index');
     Route::get('actividades/materias/{materia}', [ActividadController::class, 'materia'])->name('actividades.materia');
     Route::post('actividades/materias/{materia}/periodos', [ActividadController::class, 'storePeriodo'])->name('actividades.periodos.store');
