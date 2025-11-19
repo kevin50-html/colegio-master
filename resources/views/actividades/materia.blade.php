@@ -34,51 +34,27 @@
                         <div class="col-12 col-lg-4">
                             <div class="card shadow-sm mb-4">
                                 <div class="card-header bg-white">
-                                    <h5 class="mb-0">Nuevo periodo</h5>
-                                    <small class="text-muted">Configura periodos para habilitar actividades.</small>
+                                    <h5 class="mb-0">Periodos de la materia</h5>
+                                    <small class="text-muted">Gestiona los periodos desde el módulo dedicado.</small>
                                 </div>
                                 <div class="card-body">
-                                    <form action="{{ route('actividades.periodos.store', $materia) }}" method="POST" class="row g-3">
-                                        @csrf
-                                        <div class="col-12">
-                                            <label for="nombre" class="form-label">Nombre</label>
-                                            <input type="text" name="nombre" id="nombre" value="{{ old('nombre') }}" class="form-control @error('nombre') is-invalid @enderror" placeholder="Ej. Primer Periodo" required>
-                                            @error('nombre')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label for="fecha_inicio" class="form-label">Fecha inicio</label>
-                                            <input type="date" name="fecha_inicio" id="fecha_inicio" value="{{ old('fecha_inicio') }}" class="form-control @error('fecha_inicio') is-invalid @enderror">
-                                            @error('fecha_inicio')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label for="fecha_fin" class="form-label">Fecha fin</label>
-                                            <input type="date" name="fecha_fin" id="fecha_fin" value="{{ old('fecha_fin') }}" class="form-control @error('fecha_fin') is-invalid @enderror">
-                                            @error('fecha_fin')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-        
-                                        <div class="col-12">
-                                            <label for="orden" class="form-label">Orden</label>
-                                            <input type="number" name="orden" id="orden" value="{{ old('orden') }}" class="form-control @error('orden') is-invalid @enderror" min="1" placeholder="Ej. 1">
-                                            @error('orden')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                        <div class="col-12 d-grid">
-                                            <button type="submit" class="btn btn-primary">
-                                                <i class="fas fa-save me-1"></i> Guardar periodo
-                                            </button>
-                                        </div>
-                                    </form>
+                                    @if($periodos->isEmpty())
+                                        <div class="alert alert-info">No hay periodos configurados para esta materia.</div>
+                                    @else
+                                        <ul class="list-group list-group-flush">
+                                            @foreach($periodos as $periodo)
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <span class="fw-semibold">{{ $periodo->nombre }}</span>
+                                                    <span class="text-muted small">Orden {{ $periodo->orden ?? '-' }}</span>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
+                                    <div class="d-grid mt-3">
+                                        <a href="{{ route('periodos.materia', $materia) }}" class="btn btn-outline-primary">
+                                            <i class="fas fa-calendar-alt me-1"></i> Ir a periodos
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
 
@@ -90,7 +66,7 @@
                                 <div class="card-body">
                                     @if($periodos->isEmpty())
                                         <div class="alert alert-info mb-0">
-                                            No hay periodos configurados para esta materia.
+                                            No hay periodos configurados para esta materia. Crea uno en el módulo de periodos.
                                         </div>
                                     @else
                                         <form action="{{ route('actividades.store', $materia) }}" method="POST" class="row g-3">
