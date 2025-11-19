@@ -88,17 +88,9 @@
                                     <small class="text-muted">Registra tareas para esta materia.</small>
                                 </div>
                                 <div class="card-body">
-                                    @php
-                                        $totalHorarios = $periodos->sum(fn($periodo) => $periodo->horarios->count());
-                                    @endphp
-
                                     @if($periodos->isEmpty())
                                         <div class="alert alert-info mb-0">
                                             No hay periodos configurados para esta materia.
-                                        </div>
-                                    @elseif($totalHorarios === 0)
-                                        <div class="alert alert-warning mb-0">
-                                            No hay horarios asignados a los periodos de esta materia. Registra al menos uno para crear actividades.
                                         </div>
                                     @else
                                         <form action="{{ route('actividades.store', $materia) }}" method="POST" class="row g-3">
@@ -114,27 +106,6 @@
                                                     @endforeach
                                                 </select>
                                                 @error('periodo_id')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-
-                                            <div class="col-12">
-                                                <label for="horario_id" class="form-label">Horario</label>
-                                                <select name="horario_id" id="horario_id" class="form-select @error('horario_id') is-invalid @enderror" required>
-                                                    <option value="">Selecciona un horario</option>
-                                                    @foreach($periodos as $periodo)
-                                                        @if($periodo->horarios->isNotEmpty())
-                                                            <optgroup label="{{ $periodo->nombre }}">
-                                                                @foreach($periodo->horarios as $horario)
-                                                                    <option value="{{ $horario->id }}" @selected(old('horario_id') == $horario->id)>
-                                                                        {{ ucfirst($horario->dia) }} {{ $horario->hora_inicio?->format('H:i') }} - {{ $horario->hora_fin?->format('H:i') }} {{ $horario->aula ? '· Aula ' . $horario->aula : '' }}
-                                                                    </option>
-                                                                @endforeach
-                                                            </optgroup>
-                                                        @endif
-                                                    @endforeach
-                                                </select>
-                                                @error('horario_id')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
                                             </div>

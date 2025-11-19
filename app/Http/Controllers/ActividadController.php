@@ -40,7 +40,7 @@ class ActividadController extends Controller
     {
         $periodos = Periodo::query()
             ->where('materia_id', $materia->id)
-            ->with(['materia', 'horarios'])
+            ->with('materia')
             ->orderBy('orden')
             ->orderBy('nombre')
             ->get();
@@ -87,7 +87,6 @@ class ActividadController extends Controller
     {
         $data = $request->validate([
             'periodo_id' => 'required|integer|exists:periodos,id',
-            'horario_id' => 'required|integer|exists:horarios,id',
             'titulo' => 'required|string|max:255',
             'fecha_entrega' => 'nullable|date',
             'porcentaje' => 'nullable|integer|min:1|max:100',
@@ -99,13 +98,8 @@ class ActividadController extends Controller
             ->where('materia_id', $materia->id)
             ->firstOrFail();
 
-        $horario = $periodo->horarios()
-            ->where('id', $data['horario_id'])
-            ->firstOrFail();
-
         Actividad::create([
             'periodo_id' => $periodo->id,
-            'horario_id' => $horario->id,
             'titulo' => $data['titulo'],
             'fecha_entrega' => $data['fecha_entrega'] ?? null,
             'porcentaje' => $data['porcentaje'] ?? null,
