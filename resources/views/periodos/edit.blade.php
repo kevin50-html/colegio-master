@@ -44,7 +44,7 @@
 
                                 <div class="col-md-6">
                                     <label for="fecha_inicio" class="form-label">Fecha inicio</label>
-                                    <input type="date" name="fecha_inicio" id="fecha_inicio" value="{{ old('fecha_inicio', optional($periodo->fecha_inicio)->format('Y-m-d')) }}" class="form-control @error('fecha_inicio') is-invalid @enderror">
+                                    <input type="date" name="fecha_inicio" id="fecha_inicio" value="{{ old('fecha_inicio', optional($periodo->fecha_inicio)->format('Y-m-d')) }}" class="form-control @error('fecha_inicio') is-invalid @enderror" required>
                                     @error('fecha_inicio')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -52,7 +52,7 @@
 
                                 <div class="col-md-6">
                                     <label for="fecha_fin" class="form-label">Fecha fin</label>
-                                    <input type="date" name="fecha_fin" id="fecha_fin" value="{{ old('fecha_fin', optional($periodo->fecha_fin)->format('Y-m-d')) }}" class="form-control @error('fecha_fin') is-invalid @enderror">
+                                    <input type="date" name="fecha_fin" id="fecha_fin" value="{{ old('fecha_fin', optional($periodo->fecha_fin)->format('Y-m-d')) }}" class="form-control @error('fecha_fin') is-invalid @enderror" required>
                                     @error('fecha_fin')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -60,7 +60,7 @@
 
                                 <div class="col-12">
                                     <label for="orden" class="form-label">Orden</label>
-                                    <input type="number" name="orden" id="orden" value="{{ old('orden', $periodo->orden) }}" class="form-control @error('orden') is-invalid @enderror" min="1">
+                                    <input type="number" name="orden" id="orden" value="{{ old('orden', $periodo->orden) }}" class="form-control @error('orden') is-invalid @enderror" min="1" required>
                                     @error('orden')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror

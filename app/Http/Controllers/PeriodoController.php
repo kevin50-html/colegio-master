@@ -102,16 +102,19 @@ class PeriodoController extends Controller
     {
         return $request->validate([
             'nombre' => ['required', 'string', 'max:255'],
-            'fecha_inicio' => ['nullable', 'date'],
-            'fecha_fin' => ['nullable', 'date', 'after_or_equal:fecha_inicio'],
-            'orden' => ['nullable', 'integer', 'min:1'],
+            'fecha_inicio' => ['required', 'date'],
+            'fecha_fin' => ['required', 'date', 'after_or_equal:fecha_inicio'],
+            'orden' => ['required', 'integer', 'min:1'],
         ], [
             'nombre.required' => 'El nombre del periodo es obligatorio.',
             'nombre.string' => 'El nombre del periodo debe ser texto válido.',
             'nombre.max' => 'El nombre del periodo no debe superar 255 caracteres.',
+            'fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
             'fecha_inicio.date' => 'La fecha inicio debe ser una fecha válida.',
+            'fecha_fin.required' => 'La fecha fin es obligatoria.',
             'fecha_fin.date' => 'La fecha fin debe ser una fecha válida.',
             'fecha_fin.after_or_equal' => 'La fecha fin debe ser posterior o igual a la fecha inicio.',
+            'orden.required' => 'El orden es obligatorio.',
             'orden.integer' => 'El orden debe ser un número entero.',
             'orden.min' => 'El orden debe ser al menos 1.',
         ]);
